@@ -17,7 +17,7 @@ namespace ZstdSharp.Benchmark
     public class Benchmark
     {
 
-        private readonly string folder = @"E:\Bin\data\";
+        private readonly string folder = @"E:\Bin\dbeaver\";
         private readonly string zipSharp = "zipsharp.zip";
         private readonly string zipSystem = "zipsystem.zip";
         private readonly string zipZstd = "zipzstd.zip";
@@ -59,7 +59,7 @@ namespace ZstdSharp.Benchmark
             {
                 File.Delete(zipZstd);
             }
-            ZipSharp.ZipLibABI.CompressDir(folder, zipZstd);
+            ZipSharp.ZipLibABI.CompressDir(folder, zipZstd,ZipSharp.CompressMethod.Zstd);
         }
 
 

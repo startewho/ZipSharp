@@ -7,9 +7,9 @@ use std::str;
 
 use walkdir::{DirEntry, WalkDir};
 use zip::write::FileOptions;
-
+use zip::CompressionMethod;
 #[no_mangle]
-pub extern "C" fn compress_dir(src_dir: * const c_char, target:* const c_char) -> i32 {
+pub extern "C" fn compress_dir(src_dir: * const c_char, target:* const c_char, method:i32) -> i32 {
     let src=mkstr(src_dir);
     let src_path=Path::new(src.as_str());
     let target_str=mkstr(target);
@@ -20,6 +20,7 @@ pub extern "C" fn compress_dir(src_dir: * const c_char, target:* const c_char) -
         &mut dir.into_iter().filter_map(|e| e.ok()),
         src.as_str(),
         zipfile,
+        method
     )
     .unwrap_or(());
     1
@@ -41,13 +42,22 @@ fn zip_dir<T>(
     it: &mut dyn Iterator<Item = DirEntry>,
     prefix: &str,
     writer: T,
+    method:i32,
 ) -> zip::result::ZipResult<()>
 where
     T: Write + Seek,
 {
+    let compressMethod:CompressionMethod= match method {
+        0=>CompressionMethod::Stored,
+        1|_=>CompressionMethod::Deflated,
+        2=>CompressionMethod::Bzip2,
+        3=>CompressionMethod::Aes,
+        4=>CompressionMethod::Zstd,
+    };
+
     let mut zip = zip::ZipWriter::new(writer);
     let options = FileOptions::default()
-        .compression_method(zip::CompressionMethod::Deflated) 
+        .compression_method(compressMethod) 
         .unix_permissions(0o755); 
 
     let mut buffer = Vec::new();

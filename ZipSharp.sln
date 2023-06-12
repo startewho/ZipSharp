@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZipSharp.Benchmark", "Bench
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZipSharp", "ZipSharp\ZipSharp.csproj", "{395E3486-256C-4553-88D0-382783A3412B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchs", "benchs", "{A7658FE2-B095-4AB5-B5F1-22CC68FC5D68}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AFE1C36A-B232-45D3-83E4-6FF4B5DF3EF9} = {A7658FE2-B095-4AB5-B5F1-22CC68FC5D68}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6DEC024C-37A9-4BD9-BC31-079EF9369A7D}
