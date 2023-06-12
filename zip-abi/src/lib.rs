@@ -47,17 +47,18 @@ fn zip_dir<T>(
 where
     T: Write + Seek,
 {
-    let compressMethod:CompressionMethod= match method {
+    let compress_method:CompressionMethod= match method {
         0=>CompressionMethod::Stored,
-        1|_=>CompressionMethod::Deflated,
+        1=>CompressionMethod::Deflated,
         2=>CompressionMethod::Bzip2,
         3=>CompressionMethod::Aes,
         4=>CompressionMethod::Zstd,
+        _=>CompressionMethod::Deflated,
     };
 
     let mut zip = zip::ZipWriter::new(writer);
     let options = FileOptions::default()
-        .compression_method(compressMethod) 
+        .compression_method(compress_method) 
         .unix_permissions(0o755); 
 
     let mut buffer = Vec::new();
