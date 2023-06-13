@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 namespace ZipSharp
 {
 
-
+    /// <summary>
+    /// CompressMethod
+    /// </summary>
     public enum CompressMethod
     {
         Stored = 0,
@@ -19,12 +21,12 @@ namespace ZipSharp
         Zstd,
     }
 
-    public class ZipLibABI
+    public partial class ZipLibABI
     {
-        [DllImport("zip", EntryPoint = "extract_file")]
-        public static extern int ExtractFile(string srcName, string targetPath);
+        [LibraryImport("zip", EntryPoint = "extract_file",StringMarshalling = StringMarshalling.Utf8)]
+        public  static partial int ExtractFile(string srcName, string targetPath);
 
-        [DllImport("zip", EntryPoint = "compress_dir")]
-        public static extern int CompressDir(string srcPath, string targetName,CompressMethod method=CompressMethod.Deflated);
+        [LibraryImport("zip", EntryPoint = "compress_dir",StringMarshalling =StringMarshalling.Utf8)]
+        public static partial  int CompressDir(string srcPath, string targetName,CompressMethod method=CompressMethod.Deflated);
     }
 }
