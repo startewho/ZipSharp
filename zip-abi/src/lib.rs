@@ -36,6 +36,18 @@ fn mkstr(s: *const c_char) -> String {
     String::from(r_str)
 }
 
+fn path_to_string(path: &std::path::Path) -> String {
+    let mut path_str = String::new();
+    for component in path.components() {
+        if let std::path::Component::Normal(os_str) = component {
+            if !path_str.is_empty() {
+                path_str.push('/');
+            }
+            path_str.push_str(&os_str.to_string_lossy());
+        }
+    }
+    path_str
+}
 
 
 fn zip_dir<T>(
@@ -70,7 +82,8 @@ where
         
         if path.is_file() {
            
-            zip.start_file_from_path(name.into(), options)?;
+            zip.start_file( path_to_string(name), options)?;
+            
             let mut f = File::open(path)?;
 
             f.read_to_end(&mut buffer)?;
@@ -78,7 +91,8 @@ where
             buffer.clear();
         } else if name.as_os_str().len() != 0 {
            
-            zip.add_directory_from_path(name, options)?;
+            zip.start_file( path_to_string(name), options)?;
+            zip.add_directory(path_to_string(name), options)?;
         }
     }
     zip.finish()?;
@@ -101,7 +115,6 @@ pub extern "C" fn extract_file(src: * const c_char, target: * const c_char)->i32
     }
     for i in 0..zip.len() {
         let mut file = zip.by_index(i).unwrap();
-        println!("Filename: {} {:?}", file.name(), file.sanitized_name());
         if file.is_dir() {
             
             let target = target_path.join(Path::new(&file.name().replace("\\", "")));
