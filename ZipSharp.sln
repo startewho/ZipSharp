@@ -5,9 +5,13 @@ VisualStudioVersion = 17.6.33513.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZipSharp.Benchmark", "Benchs\ZipSharp.Benchmark.csproj", "{AFE1C36A-B232-45D3-83E4-6FF4B5DF3EF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZipSharp", "ZipSharp\ZipSharp.csproj", "{395E3486-256C-4553-88D0-382783A3412B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZipSharp", "ZipSharp\ZipSharp.csproj", "{395E3486-256C-4553-88D0-382783A3412B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchs", "benchs", "{A7658FE2-B095-4AB5-B5F1-22CC68FC5D68}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchs", "Benchs", "{A7658FE2-B095-4AB5-B5F1-22CC68FC5D68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZipSharpTest", "Tests\ZipSharpTest\ZipSharpTest.csproj", "{BB510673-B19D-4C3F-A756-6E7CCB01FA9E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9DD7DE76-C76F-4C17-AB14-6E504BFA0383}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,12 +27,17 @@ Global
 		{395E3486-256C-4553-88D0-382783A3412B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{395E3486-256C-4553-88D0-382783A3412B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{395E3486-256C-4553-88D0-382783A3412B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB510673-B19D-4C3F-A756-6E7CCB01FA9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB510673-B19D-4C3F-A756-6E7CCB01FA9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB510673-B19D-4C3F-A756-6E7CCB01FA9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB510673-B19D-4C3F-A756-6E7CCB01FA9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AFE1C36A-B232-45D3-83E4-6FF4B5DF3EF9} = {A7658FE2-B095-4AB5-B5F1-22CC68FC5D68}
+		{BB510673-B19D-4C3F-A756-6E7CCB01FA9E} = {9DD7DE76-C76F-4C17-AB14-6E504BFA0383}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6DEC024C-37A9-4BD9-BC31-079EF9369A7D}
