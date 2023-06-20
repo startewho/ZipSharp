@@ -10,7 +10,7 @@ namespace ZipSharpTest
         [Theory]
         [InlineData("TestFile\\a.zip","", "border.json", 13630)]
         [InlineData("TestFile\\a.zip", "", "sub/sub子路径/border.json", 13630)]
-        public void ZipIndexDic(string zipFileName,string password,string fileName,long fileSize)
+        public void ZipIndexFile(string zipFileName,string password,string fileName,long fileSize)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding encoding = Encoding.UTF8;
@@ -47,6 +47,27 @@ namespace ZipSharpTest
             
 
         }
+
+        [Theory]
+        [InlineData("TestFile\\a.zip")]
+        public void ZipIndexSerDic(string zipFileName)
+        {
+            var dict = IndexFile.GetIndexs(zipFileName,null);
+
+            Assert.NotNull(dict);
+
+            var bytes = IndexFile.Ser(dict);
+            
+            Assert.NotNull(bytes);
+
+            var desDic = IndexFile.Des(bytes);
+
+            Assert.NotNull(desDic); 
+
+            Assert.Equal(dict.Count,desDic.Count);
+        }
+
+
 
         public static bool HasChinese(string str)
         {

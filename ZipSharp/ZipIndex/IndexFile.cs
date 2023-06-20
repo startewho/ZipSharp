@@ -4,61 +4,86 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
+using MessagePack;
 
 namespace ZipSharp.ZipIndex
 {
+    [MessagePackObject]
     public class IndexFile
     {
         /// <summary>
         /// Name of the file as stored in the zip.
         /// </summary>
+        [Key(0)]
         public string Name { get; set; }
 
 
         /// <summary>
         /// Size of compressed data, excluding ZIP headers.
         /// </summary>
+        [Key(1)]
         public long CompressedSize64 { get; set; }
 
 
         /// <summary>
         /// Size of the Uncompressed data.
         /// </summary>
+        [Key(2)]
         public long UncompressedSize64 { get; set; }
 
 
         /// <summary>
         /// Offset where file data header starts.
         /// </summary>
+        [Key(3)]
         public long Offset { get; set; }
 
 
         /// <summary>
         /// CRC of the uncompressed data.
         /// </summary>
+        [Key(4)]
         public long CRC32 { get; set; }
 
 
         /// <summary>
         /// The index of file in the zip file.
         /// </summary>
+        [Key(5)]
         public long ZipFileIndex { get; set; }
 
         /// <summary>
         /// Storage method.
         /// </summary>
+        [Key(6)]
         public ushort Method { get; set; }  // Storage method.
 
         /// <summary>
         /// General purpose bit flag.
         /// </summary>
+        [Key(7)]
         public ushort Flags { get; set; }
 
 
         /// <summary>
         /// Custom data.
         /// </summary>
+        [Key(8)]
         public Dictionary<string, string> Custom { get; set; }
+
+
+        public static byte[] Ser(Dictionary<string, IndexFile> dic)
+        {
+            byte[] bytes = MessagePackSerializer.Serialize(dic);
+            return bytes;
+        }
+
+
+        public static Dictionary<string, IndexFile> Des(byte[] bytes)
+        {
+            var dict= MessagePackSerializer.Deserialize<Dictionary<string, IndexFile>>(bytes);
+            return dict;
+        }
 
 
         /// <summary>
