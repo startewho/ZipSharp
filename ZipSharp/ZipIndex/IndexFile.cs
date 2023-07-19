@@ -8,6 +8,68 @@ using MessagePack;
 
 namespace ZipSharp.ZipIndex
 {
+    public class ZipFileInfo
+    {
+        [Key(0)]
+        public ushort Method { get; set; }  // Storage method.
+
+        [Key(1)]
+        public ushort Level { get; set; }  // Storage method.
+
+        [Key(2)]
+        public Dictionary<string, IndexFile> Files { get; set; }
+
+        public static byte[] Ser(ZipFileInfo zipInfo)
+        {
+            byte[] bytes = MessagePackSerializer.Serialize(zipInfo);
+            return bytes;
+        }
+
+
+        public static ZipFileInfo Des(byte[] bytes)
+        {
+            var zipInfo = MessagePackSerializer.Deserialize<ZipFileInfo>(bytes);
+            return zipInfo;
+        }
+
+        public static ZipFileInfo GetIndexs(string zipFileName, string password, Encoding encoding = null)
+        {
+            var info = new ZipFileInfo();
+            var dict = new Dictionary<string, IndexFile>();
+            using Stream inputStream = File.Open(zipFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var zipFile = new ZipFile(inputStream, false, StringCodec.Default);
+            if (string.IsNullOrEmpty(password))
+            {
+                zipFile.Password = password;
+            }
+            foreach (var item in zipFile)
+            {
+                var entry = (ZipEntry)item;
+                if (entry.IsFile)
+                {
+                    var indexFile = new IndexFile()
+                    {
+                        Name = entry.Name,
+                        Offset = entry.Offset,
+                        CompressedSize64 = entry.CompressedSize,
+                        UncompressedSize64 = entry.Size,
+                        CRC32 = entry.Crc,
+                        ZipFileIndex = entry.ZipFileIndex,
+                        Flags = (ushort)entry.Flags,
+                    };
+
+                    info.Method = (ushort)entry.CompressionMethod;
+                    dict.TryAdd(entry.Name, indexFile);
+                }
+            }
+            info.Files = dict;
+
+
+            return info;
+        }
+
+    }
+
     [MessagePackObject]
     public class IndexFile
     {
@@ -55,35 +117,23 @@ namespace ZipSharp.ZipIndex
         /// <summary>
         /// Storage method.
         /// </summary>
-        [Key(6)]
-        public ushort Method { get; set; }  // Storage method.
+
 
         /// <summary>
         /// General purpose bit flag.
         /// </summary>
-        [Key(7)]
+        [Key(6)]
         public ushort Flags { get; set; }
 
 
         /// <summary>
         /// Custom data.
         /// </summary>
-        [Key(8)]
+        [Key(7)]
         public Dictionary<string, string> Custom { get; set; }
 
 
-        public static byte[] Ser(Dictionary<string, IndexFile> dic)
-        {
-            byte[] bytes = MessagePackSerializer.Serialize(dic);
-            return bytes;
-        }
 
-
-        public static Dictionary<string, IndexFile> Des(byte[] bytes)
-        {
-            var dict= MessagePackSerializer.Deserialize<Dictionary<string, IndexFile>>(bytes);
-            return dict;
-        }
 
 
         /// <summary>
@@ -92,41 +142,11 @@ namespace ZipSharp.ZipIndex
         /// <param name="zipFileName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static Dictionary<string, IndexFile> GetIndexs(string zipFileName, string password, Encoding encoding = null)
-        {
-            var dict = new Dictionary<string, IndexFile>();
-            using Stream inputStream = File.Open(zipFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            using var zipFile = new ZipFile(inputStream, false, StringCodec.Default);
-            if (string.IsNullOrEmpty(password))
-            {
-                zipFile.Password = password;
-            }
-            foreach (var item in zipFile)
-            {
-                var entry = (ZipEntry)item;
-                if (entry.IsFile)
-                {
-                    var indexFile = new IndexFile()
-                    {
-                        Name = entry.Name,
-                        Offset = entry.Offset,
-                        CompressedSize64 = entry.CompressedSize,
-                        UncompressedSize64 = entry.Size,
-                        CRC32 = entry.Crc,
-                        ZipFileIndex = entry.ZipFileIndex,
-                        Method = (ushort)entry.CompressionMethod,
-                        Flags = (ushort)entry.Flags,
-                    };
-                    dict.TryAdd(entry.Name, indexFile);
-                }
-            }
-            return dict;
-        }
 
-        public static Stream GetIndexFileStream(string zipFileName, string password, IndexFile indexFile, Encoding encoding = null)
+        public static Stream GetIndexFileStream(string zipFileName, string password, int method, IndexFile indexFile, Encoding encoding = null)
         {
             Stream inputStream = File.Open(zipFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return GetIndexFileStream(inputStream, password, indexFile, encoding);
+            return GetIndexFileStream(inputStream, password, method, indexFile, encoding);
         }
 
         /// <summary>
@@ -136,7 +156,7 @@ namespace ZipSharp.ZipIndex
         /// <param name="password"></param>
         /// <param name="indexFile"></param>
         /// <returns></returns>
-        public static Stream GetIndexFileStream(Stream zipFileStream, string password, IndexFile indexFile, Encoding encoding = null)
+        public static Stream GetIndexFileStream(Stream zipFileStream, string password, int method, IndexFile indexFile, Encoding encoding = null)
         {
             using var zipFile = new ZipFile(zipFileStream, true, StringCodec.FromEncoding(encoding));
             if (string.IsNullOrEmpty(password))
@@ -150,7 +170,7 @@ namespace ZipSharp.ZipIndex
                 Size = indexFile.UncompressedSize64,
                 Crc = indexFile.CRC32,
                 ZipFileIndex = indexFile.ZipFileIndex,
-                CompressionMethod = (CompressionMethod)indexFile.Method,
+                CompressionMethod = (CompressionMethod)method,
                 Flags = indexFile.Flags,
             };
             return zipFile.GetInputStream(entry);

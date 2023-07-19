@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EasyCompressor" Version="1.4.0" />
     <PackageReference Include="MessagePack" Version="2.6.100-alpha" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
   </ItemGroup>
