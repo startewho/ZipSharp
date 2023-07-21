@@ -176,8 +176,9 @@ public class ZipIndexTest
 }
 
 
-public static bool HasChinese(string str)
+public static bool HasChinese( string str)
 {
+      
     return Regex.IsMatch(str, @"[\u4e00-\u9fa5]");
 }
 }

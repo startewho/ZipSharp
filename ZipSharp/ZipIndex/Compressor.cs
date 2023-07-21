@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EasyCompressor;
+using ICSharpCode.SharpZipLib.BZip2;
 
 namespace ZipSharp.ZipIndex
 {
@@ -30,19 +31,42 @@ namespace ZipSharp.ZipIndex
                 case CompressMethod.Zstd:
                     return zstd.Value;
             }
-            return deflat.Value;
+            return null;
         }
         public static long Compress(Stream inStream, Stream outStream, CompressMethod compressMethod)
         {
-            var compressor = GetCompressor(compressMethod);
-
-            compressor.Compress(inStream, outStream);
+            if (compressMethod == CompressMethod.Aes)
+            {
+                throw new NotSupportedException(nameof(CompressMethod.Aes));
+            }
+            if (compressMethod == CompressMethod.Zstd)
+            {
+                BZip2.Compress(inStream, outStream, false, 6);
+            }
+            else
+            {
+                var compressor = GetCompressor(compressMethod);
+                compressor.Compress(inStream, outStream);
+            }
+            outStream.Position = 0;
             return outStream.Length;
         }
-        public static long Decompress(Stream inStream, Stream outStream, CompressMethod compressMethod=CompressMethod.Deflated)
+        public static long Decompress(Stream inStream, Stream outStream, CompressMethod compressMethod = CompressMethod.Deflated)
         {
-            var compressor = GetCompressor(compressMethod);
-            compressor.Decompress(inStream, outStream);
+            if (compressMethod == CompressMethod.Aes)
+            {
+                throw new NotSupportedException(nameof(CompressMethod.Aes));
+            }
+            if (compressMethod == CompressMethod.Zstd)
+            {
+                BZip2.Decompress(inStream, outStream, false);
+            }
+            else
+            {
+                var compressor = GetCompressor(compressMethod);
+                compressor.Decompress(inStream, outStream);
+            }
+            outStream.Position = 0;
             return outStream.Length;
         }
     }
