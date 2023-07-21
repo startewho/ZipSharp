@@ -87,10 +87,7 @@ public class ZipIndexTest
                 {
                     Directory.CreateDirectory(folder);
                 }
-                fileStream.Position = file.Offset + 26;
-                var fileNameLength = ReadLEUshort(fileStream); //2byte
-                var commentLength = ReadLEUshort(fileStream); //2byte
-                fileStream.Position = file.Offset + 30 + fileNameLength + commentLength;
+                fileStream.Position = file.Offset + file.HeaderSize;
                 var buffers = new byte[file.CompressedSize64];
                 using (var inStream = new MemoryStream())
                 {
@@ -130,10 +127,7 @@ public class ZipIndexTest
                 {
                     Directory.CreateDirectory(folder);
                 }
-                fileStream.Position = file.Offset + 26;
-                var fileNameLength = ReadLEUshort(fileStream); //2byte
-                var commentLength = ReadLEUshort(fileStream); //2byte
-                fileStream.Position = file.Offset + 30 + fileNameLength + commentLength;
+                fileStream.Position = file.Offset + file.HeaderSize; ;
                 var buffers = new byte[file.CompressedSize64];
                 using (var inStream = new MemoryStream())
                 {
@@ -156,29 +150,12 @@ public class ZipIndexTest
 
     }
 
-    static ushort ReadLEUshort(Stream baseStream)
-{
-    int data1 = baseStream.ReadByte();
 
-    if (data1 < 0)
+
+
+    public static bool HasChinese(string str)
     {
-        throw new EndOfStreamException("End of stream");
+
+        return Regex.IsMatch(str, @"[\u4e00-\u9fa5]");
     }
-
-    int data2 = baseStream.ReadByte();
-
-    if (data2 < 0)
-    {
-        throw new EndOfStreamException("End of stream");
-    }
-
-    return unchecked((ushort)((ushort)data1 | (ushort)(data2 << 8)));
-}
-
-
-public static bool HasChinese( string str)
-{
-      
-    return Regex.IsMatch(str, @"[\u4e00-\u9fa5]");
-}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,7 +58,7 @@ namespace ZipSharp.ZipIndex
                         ZipFileIndex = entry.ZipFileIndex,
                         Flags = (ushort)entry.Flags,
                     };
-
+                    GetHeaderSize(inputStream, indexFile);
                     info.Method = (ushort)entry.CompressionMethod;
                     dict.TryAdd(entry.Name, indexFile);
                 }
@@ -68,6 +69,40 @@ namespace ZipSharp.ZipIndex
             return info;
         }
 
+        /// <summary>
+        ///  Get Local EntryFile 's Header Size
+        /// </summary>
+        /// <param name="zipStream"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        private static int GetHeaderSize(Stream zipStream, IndexFile file)
+        {
+            zipStream.Position = file.Offset + 26;//local header fix length
+            var nameLength = ReadLEUshort(zipStream); //2byte
+            var commentLength = ReadLEUshort(zipStream); //2byte
+            file.HeaderSize = 30 + nameLength + commentLength;
+            return file.HeaderSize;
+        }
+
+
+        static ushort ReadLEUshort(Stream baseStream)
+        {
+            int data1 = baseStream.ReadByte();
+
+            if (data1 < 0)
+            {
+                throw new EndOfStreamException("End of stream");
+            }
+
+            int data2 = baseStream.ReadByte();
+
+            if (data2 < 0)
+            {
+                throw new EndOfStreamException("End of stream");
+            }
+
+            return unchecked((ushort)((ushort)data1 | (ushort)(data2 << 8)));
+        }
     }
 
     [MessagePackObject]
@@ -101,17 +136,20 @@ namespace ZipSharp.ZipIndex
         public long Offset { get; set; }
 
 
+        [Key(4)]
+        public int HeaderSize { get; set; }
+
         /// <summary>
         /// CRC of the uncompressed data.
         /// </summary>
-        [Key(4)]
+        [Key(5)]
         public long CRC32 { get; set; }
 
 
         /// <summary>
         /// The index of file in the zip file.
         /// </summary>
-        [Key(5)]
+        [Key(6)]
         public long ZipFileIndex { get; set; }
 
         /// <summary>
@@ -122,14 +160,14 @@ namespace ZipSharp.ZipIndex
         /// <summary>
         /// General purpose bit flag.
         /// </summary>
-        [Key(6)]
+        [Key(7)]
         public ushort Flags { get; set; }
 
 
         /// <summary>
         /// Custom data.
         /// </summary>
-        [Key(7)]
+        [Key(8)]
         public Dictionary<string, string> Custom { get; set; }
 
 
